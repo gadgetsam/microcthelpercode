@@ -5,6 +5,8 @@ from calculate_porosity import calculate_porosity
 import multiprocessing
 import time
 import csv
+import re
+
 """"
 Definition: run_on runs function on all the images in all the folders inside a folder and then outputs the images into an output directory while keeping the file structure the same. It does this in parallel 
 
@@ -24,16 +26,28 @@ def run_on(function, folder_path, output_path, num_threads=16):
         queue2 is used for stopping the processes when done
     """
 
-    def run_on_files(function, folder_path_len, queue, queue2):
+    def run_on_files(function, folder_path_len, output_path, process_num,queue, queue2):
+        pattern = re.compile(r"([0-9]+)\.rec")
+        f = open(output_path + "/porosity" + str(process_num) + ".csv", "w")
         while not queue.empty():  # runs until the queue is empty
             directory = queue.get()  # gets a directory and removes it from the queue
-            f = open(output_path + directory[folder_path_len:]+"/porosity.csv")  # makes a new folder in the output path for the directory
+             # makes a new folder in the output path for the directory
+
 
             file_list = [x[2] for x in os.walk(directory)]
             for file in file_list[0]:
-                image = tiff.imread(directory + "/" + file)  # loads file
-                out_image = function(image)
-                 # saves file
+                # print(file)
+                if ".tif" in file:
+                    image = tiff.imread(directory + "/" + file)  # loads file
+                    porosity_calc = function(image)
+                    id_file = pattern.search(str(file)).group(1)
+                    id_directory = directory[-5:]
+
+                    data = [porosity_calc, id_file, id_directory]
+                    out = csv.writer(f, delimiter=',', quoting=csv.QUOTE_ALL)
+                    out.writerow(data)
+
+                # saves file
                 # print(file)
         queue2.put(1)  # tells the main process that it is done
 
@@ -51,8 +65,8 @@ def run_on(function, folder_path, output_path, num_threads=16):
 
             queue.put(directory)  # adds the directory to the queue
     process_list = []
-    for _ in range(num_threads):  # spawns each of the processes with the run_on_files functions
-        temp = multiprocessing.Process(target=run_on_files, args=(function, folder_path_len, queue, queue2))
+    for x in range(num_threads):  # spawns each of the processes with the run_on_files functions
+        temp = multiprocessing.Process(target=run_on_files, args=(function, folder_path_len, output_path,x, queue, queue2))
         temp.start()
         process_list.append(temp)
     while not queue.empty():  # waits until all the queue is empty processes might still be processing their final function
@@ -65,11 +79,11 @@ def run_on(function, folder_path, output_path, num_threads=16):
 
 if __name__ == "__main__":
     folder_path = '/media/samschickler/1F6D-D692/FiberForm_19A_air_760torr_13_fast'
-    output_path = '/media/samschickler/1F6D-D692/Output'
+    output_path = '/media/samschickler/1F6D-D692/Porosity'
 
 
     def input_function(image):  # this is used to specify all the parameters to crop
-        return calculate_porosity(image, image_loaded=True)
+        return calculate_porosity(image, circle_mask=True, circle_mask_size=.8, image_loaded=True)
 
 
     run_on(input_function, folder_path, output_path)

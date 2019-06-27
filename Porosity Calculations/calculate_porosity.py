@@ -13,7 +13,7 @@ Input: image file(including path), circle_mask controls whether a circular mask 
     1/10 of the height/width of the image. display_mask is a debugging tool that will display the masked image.
     image_loaded if the image should be passed as data(True) or as a path (False)
 Output: Percentage of porosity"""
-def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_mask=False, image_loaded = False):
+def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_mask=False, image_loaded = False, threshold=True):
     if image_loaded:
         image = file
     else:
@@ -28,6 +28,9 @@ def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_ma
         mask = (X - x1 / 2) ** 2 + (Y - y1 / 2) ** 2 > x1 * y1 * (circle_mask_size**2)/ 4 # defines a mask outside the
         # circle
         image[mask] = 0 # Sets image pixels in mask to 0
+        if(threshold):
+            image[image<148] = 0
+        # print(np.amax(image))
         total_area = (x1 * y1 * (circle_mask_size**2) / 4) * 3.141592 # Calculates total area of cirlce
         if display_mask:
             plt.imshow(image, cmap='gray')
@@ -44,6 +47,5 @@ def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_ma
 
     return fiber_area/total_area
 if __name__ == "__main__":
-    file = "data/thresholded data/FiberForm_19A_air_760torr_13_fast_00020/FiberForm_19A_air_760torr_13_fast_00020_0001.rec.8bit.thresholded0007.tif"
+    file = "/media/samschickler/1F6D-D692/Test/rec_8bit_phase_00010/FiberForm_19A_air_760torr_13_fast_00010_0018.rec.8bit.tif"
     test = calculate_porosity(file, circle_mask=True, circle_mask_size=.8, display_mask=True)
-    print(test)
