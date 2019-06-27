@@ -18,7 +18,7 @@ Input:
 	"""
 
 
-def run_on(function, folder_path, output_path, num_threads=16):
+def run_on(function, folder_path, output_path, num_threads=4):
     """
     Definition: run_on_files is a worker function that takes a directory and then runs a function on all the files in a directory
     inputs:
