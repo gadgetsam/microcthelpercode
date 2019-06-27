@@ -5,7 +5,6 @@ from crop import crop
 import multiprocessing
 import time
 
-
 """"
 Definition: run_on runs function on all the images in all the folders inside a folder and then outputs the images into an output directory while keeping the file structure the same. It does this in parallel 
 
@@ -15,66 +14,66 @@ Input:
 	output_path is to an already created empty directory that you want it to output to
 	num_threads is the number of workers that it will spawn 
 	"""
-def run_on(function, folder_path, output_path, num_threads = 16):
-	"""
-	Definition: run_on_files is a worker function that takes a directory and then runs a function on all the files in a directory
-	inputs:
-		queue is the main queue that holds all the directories that the workers need to process
-		queue2 is used for stopping the processes when done 
-		"""
-	def run_on_files(function, folder_path_len, queue, queue2):
-    while not queue.empty(): # runs until the queue is empty 
-        directory = queue.get() #gets a directory and removes it from the queue 
-        try:
-            os.rmdir(output_path + directory[folder_path_len:]) 
-        except:
-            pass
-        os.mkdir(output_path + directory[folder_path_len:]) #makes a new folder in the output path for the directory
-        file_list = [x[2] for x in os.walk(directory)]  
-        for file in file_list[0]:
-            image = tiff.imread(directory + "/" + file) #loads file
-            out_image = function(image)
-            tiff.imsave(output_path + directory[folder_path_len:] + "/" + file, image) #saves file
-            # print(file)
-    queue2.put(1) # tells the main process that it is done
-    
-    
-    
-    ## START of run_on()
-    
-    folder_path_len = len(folder_path)
-    directory_list = [x[0] for x in os.walk(folder_path)] # creates list of directories 
-    queue = multiprocessing.Queue() # creates a main queue for storing all the directories
-    queue2 = multiprocessing.Queue() # creates a queue for communicating when all the processes are done
-    for directory in directory_list:
-        if 'rec' in directory: #filters the directories to only the ones with rec in the title 
 
-            queue.put(directory) #adds the directory to the queue 
+
+def run_on(function, folder_path, output_path, num_threads=16):
+    """
+    Definition: run_on_files is a worker function that takes a directory and then runs a function on all the files in a directory
+    inputs:
+        queue is the main queue that holds all the directories that the workers need to process
+        queue2 is used for stopping the processes when done
+    """
+
+    def run_on_files(function, folder_path_len, queue, queue2):
+        while not queue.empty():  # runs until the queue is empty
+            directory = queue.get()  # gets a directory and removes it from the queue
+            try:
+                os.rmdir(output_path + directory[folder_path_len:])
+            except:
+                pass
+            os.mkdir(
+                output_path + directory[folder_path_len:])  # makes a new folder in the output path for the directory
+            file_list = [x[2] for x in os.walk(directory)]
+            for file in file_list[0]:
+                image = tiff.imread(directory + "/" + file)  # loads file
+                out_image = function(image)
+                tiff.imsave(output_path + directory[folder_path_len:] + "/" + file, image)  # saves file
+                # print(file)
+        queue2.put(1)  # tells the main process that it is done
+
+
+
+    ## START of run_on()
+
+
+    folder_path_len = len(folder_path)
+    directory_list = [x[0] for x in os.walk(folder_path)]  # creates list of directories
+    queue = multiprocessing.Queue()  # creates a main queue for storing all the directories
+    queue2 = multiprocessing.Queue()  # creates a queue for communicating when all the processes are done
+    for directory in directory_list:
+        if 'rec' in directory:  # filters the directories to only the ones with rec in the title
+
+            queue.put(directory)  # adds the directory to the queue
     process_list = []
-    for _ in range(num_threads): #spawns each of the processes with the run_on_files functions 
-        temp = multiprocessing.Process(target=run_on_files, args=(function,folder_path_len, queue, queue2))
+    for _ in range(num_threads):  # spawns each of the processes with the run_on_files functions
+        temp = multiprocessing.Process(target=run_on_files, args=(function, folder_path_len, queue, queue2))
         temp.start()
         process_list.append(temp)
-    while not queue.empty(): # waits until all the queue is empty processes might still be processing their final function
+    while not queue.empty():  # waits until all the queue is empty processes might still be processing their final function
         print(queue.qsize())
         time.sleep(1)
-    while queue2.qsize != num_threads: # this is a final check to make sure all the processes are really done 
+    while queue2.qsize != num_threads:  # this is a final check to make sure all the processes are really done
         time.sleep(1)
     for process in process_list:
         process.stop()
 
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
-	folder_path = '/media/samschickler/1F6D-D692/FiberForm_19A_air_760torr_13_fast'
-	output_path = '/media/samschickler/1F6D-D692/Output'
-	def input_function(image): # this is used to specify all the parameters to crop 
-	    crop(image, circle_mask=True, circle_mask_size=1, square_mask=True, square_mask_dim=[100,1000,100,1000])
-	run_on(input_function, folder_path, output_path)
+    folder_path = '/media/samschickler/1F6D-D692/FiberForm_19A_air_760torr_13_fast'
+    output_path = '/media/samschickler/1F6D-D692/Output'
 
+
+    def input_function(image):  # this is used to specify all the parameters to crop
+        crop(image, circle_mask=True, circle_mask_size=1, square_mask=True, square_mask_dim=[100, 1000, 100, 1000])
+
+
+    run_on(input_function, folder_path, output_path)
