@@ -1,10 +1,10 @@
 """"Author: Sam Schickler"""
 import os
 from skimage.external import tifffile as tiff
-from crop import crop
+from calculate_porosity import calculate_porosity
 import multiprocessing
 import time
-
+import csv
 """"
 Definition: run_on runs function on all the images in all the folders inside a folder and then outputs the images into an output directory while keeping the file structure the same. It does this in parallel 
 
@@ -27,17 +27,13 @@ def run_on(function, folder_path, output_path, num_threads=16):
     def run_on_files(function, folder_path_len, queue, queue2):
         while not queue.empty():  # runs until the queue is empty
             directory = queue.get()  # gets a directory and removes it from the queue
-            try:
-                os.rmdir(output_path + directory[folder_path_len:])
-            except:
-                pass
-            os.mkdir(
-                output_path + directory[folder_path_len:])  # makes a new folder in the output path for the directory
+            f = open(output_path + directory[folder_path_len:]+"/porosity.csv")  # makes a new folder in the output path for the directory
+
             file_list = [x[2] for x in os.walk(directory)]
             for file in file_list[0]:
                 image = tiff.imread(directory + "/" + file)  # loads file
                 out_image = function(image)
-                tiff.imsave(output_path + directory[folder_path_len:] + "/" + file, out_image)  # saves file
+                 # saves file
                 # print(file)
         queue2.put(1)  # tells the main process that it is done
 
@@ -73,7 +69,7 @@ if __name__ == "__main__":
 
 
     def input_function(image):  # this is used to specify all the parameters to crop
-        return crop(image, circle_mask=True, circle_mask_size=1, square_mask=True, square_mask_dim=[100, 1000, 100, 1000])
+        return calculate_porosity(image, image_loaded=True)
 
 
     run_on(input_function, folder_path, output_path)

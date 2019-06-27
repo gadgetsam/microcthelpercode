@@ -10,10 +10,14 @@ from skimage.external import tifffile as tiff
 Definition: This function finds the porosity of a given image file. 
 Input: image file(including path), circle_mask controls whether a circular mask is applied before calculating
     the porosity, circle_mask_size describe the size of the circle 1 is the full width and height of the image and .1 
-    1/10 of the height/width of the image. display_mask is a debugging tool that will display the masked imaage.
+    1/10 of the height/width of the image. display_mask is a debugging tool that will display the masked image.
+    image_loaded if the image should be passed as data(True) or as a path (False)
 Output: Percentage of porosity"""
-def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_mask=False):
-    image = tiff.imread(file)    # reads image
+def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_mask=False, image_loaded = False):
+    if image_loaded:
+        image = file
+    else:
+        image = tiff.imread(file)    # reads image
 
     if(len(image.shape) == 3):   # finds x,y dimensions of the image
         x1, y1, _ = image.shape
