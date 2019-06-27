@@ -4,9 +4,13 @@ import calculate_porosity as poros
 import re
 import datetime
 
+from pathlib import Path
+
+import csv
+
 currentDT = datetime.datetime.now()
 print ("Porosity Calculated at time:" + str(currentDT))
-from pathlib import Path
+
 
 pathlist = Path('/home/JADavi/Documents/').glob('**/*.tiff')
 
@@ -29,7 +33,7 @@ for path in pathlist:
 
 #csv thing below
 
-    import csv
+
     data = [porosity_calc, id, str(path)]
     out = csv.writer(f, delimiter=',', quoting=csv.QUOTE_ALL)
     out.writerow(data)
