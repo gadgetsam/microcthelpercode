@@ -1,8 +1,6 @@
 import calculate_porosity as poros
-from pathlib import Path
 #Written by Julian A. Davis and Josh Avery
 #import ()
-import csv
 import re
 import datetime
 
