@@ -13,7 +13,7 @@ print ("Porosity Calculated at time:" + str(currentDT))
 
 
 
-#change path to wherever binary folder is located 
+#change path to wherever binary folder is located...
 pathlist = Path('/home/JADavi/Documents/').glob('**/*.tiff')
 
 
