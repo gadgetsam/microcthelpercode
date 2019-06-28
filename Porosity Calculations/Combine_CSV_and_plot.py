@@ -55,16 +55,17 @@ combined.to_excel("combined.xlsx", header=False, index=False)
 
 
 
-#print ("test")
+print ("Starting Ploting")
 #
 # make these smaller to increase the resolution
 dx, dy = 0.05, 0.05
 
 # generate 2 2d grids for the x & y bounds
-y, x = np.mgrid[slice(1, 5 + dy, dy),
-                slice(1, 5 + dx, dx)]
+y, x = np.mgrid[slice(0, 13000 + dy, dy), #time
+                slice(0, 600 + dx, dx)] #slice
 
-z = np.sin(x)**10 + np.cos(10 + y*x) * np.cos(x)
+z = np.sin(x)**10\
+    + np.cos(10 + y*x) * np.cos(x)
 
 # x and y are bounds, so z should be the value *inside* those bounds.
 # Therefore, remove the last value from the z array.
@@ -97,3 +98,4 @@ ax1.set_title('contourf with levels')
 fig.tight_layout()
 
 plt.show()
+
