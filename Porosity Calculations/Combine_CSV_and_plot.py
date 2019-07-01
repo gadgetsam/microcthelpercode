@@ -29,6 +29,8 @@ os.chdir("/home/JADavi/Desktop/microcthelpercode/Porosity Calculations/Done_csv_
 
 pathlist = Path('/home/JADavi/Desktop/microcthelpercode/Porosity Calculations').glob('**/*.xlsx')
 
+data = concat_csv('/home/JADavi/Desktop/microcthelpercode/Porosity Calculations/All_CSV_Data/')
+
 count = 0
 for N in range (1000000, 1000000,100000):
     if N%4 == 0:
