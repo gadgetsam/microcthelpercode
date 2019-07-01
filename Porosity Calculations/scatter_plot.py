@@ -13,7 +13,8 @@ def scatter_plot(path, index):
     for index in range(number_of_graphs):
         slice_number = (index+1)*max_slice/number_of_graphs
         df = data[(data.time == slice_number)].sort_values("slice")
-        axs.plot(df.slice, df.porosity, linewidth=(index+1)/2, color="blue")
+        color = plt.cm.Blues((index+4)/(number_of_graphs+3))
+        axs.plot(df.slice, df.porosity, color=color)
         axs.set_xlim(0, 1300)
         axs.set_ylim(0, .3)
         axs.set_xlabel('Slice')
@@ -21,10 +22,6 @@ def scatter_plot(path, index):
         axs.grid(True)
     # fig.tight_layout()
     fig.set_size_inches(20,20)
-    plt.savefig(str(index)+'.png')
-# plt.figure(figsize=(16,10), dpi= 80)
-# fig, axes = joypy.joyplot(data, column=["porosity", "time"], by="slice", ylim='own', figsize=(14,10))
-#
-# # Decoration
-# plt.title('Joy Plot of City and Highway Mileage by Class', fontsize=22)
-# plt.show()
+    plt.show()
+    # plt.savefig(str(index)+'.png')
+scatter_plot('/media/samschickler/1F6D-D692/Porosity',0)
