@@ -61,7 +61,7 @@ print ("Starting Ploting")
 dx, dy = 0.05, 0.05
 
 # generate 2 2d grids for the x & y bounds
-y, x = np.mgrid[slice(0, 13000 + dy, dy), #time
+y, x = np.mgrid[slice(0, 1300 + dy, dy), #time
                 slice(0, 600 + dx, dx)] #slice
 
 z = np.sin(x)**10\
