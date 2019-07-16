@@ -28,12 +28,14 @@ def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_ma
         mask = (X - x1 / 2) ** 2 + (Y - y1 / 2) ** 2 > x1 * y1 * (circle_mask_size**2)/ 4 # defines a mask outside the
         # circle
         image[mask] = 0 # Sets image pixels in mask to 0
+        original_image = image
         if(threshold):
             image[image<148] = 0
+            image[image >= 148] = 1
         # print(np.amax(image))
         total_area = (x1 * y1 * (circle_mask_size**2) / 4) * 3.141592 # Calculates total area of cirlce
         if display_mask:
-            plt.imshow(image, cmap='gray')
+            plt.imshow(original_image, cmap='gray')
             plt.show()
     else:
         total_area = x1*y1
@@ -47,5 +49,5 @@ def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_ma
 
     return fiber_area/total_area
 if __name__ == "__main__":
-    file = "/media/samschickler/1F6D-D692/Test/rec_8bit_phase_00010/FiberForm_19A_air_760torr_13_fast_00010_0018.rec.8bit.tif"
-    test = calculate_porosity(file, circle_mask=True, circle_mask_size=.8, display_mask=True)
+    file = "/media/samschickler/1F6D-D692/Test/rec_8bit_phase_00010/FiberForm_19A_air_760torr_13_fast_00010_0200.rec.8bit.tif"
+    test = calculate_porosity(file, circle_mask=True, circle_mask_size=.8, display_mask=True, threshold=False)
