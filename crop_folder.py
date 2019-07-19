@@ -38,7 +38,7 @@ def job_array_run(whole_dataset, whole_dataset_out, base_folder, padding=5, test
         id = os.environ['SLURM_ARRAY_TASK_ID']
         print(id)
 
-    folder = os.listdir(whole_dataset)[id]
+    folder = os.listdir(whole_dataset)[int(id)]
     if base_folder in folder and os.path.isdir(os.path.join(whole_dataset, folder)):
         print(folder)
         run_on_files(os.path.join(whole_dataset, folder), os.path.join(whole_dataset_out, folder))

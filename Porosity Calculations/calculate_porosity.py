@@ -1,10 +1,9 @@
 """"Author: Sam Schickler"""
-import skimage
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-from skimage.external import tifffile as tiff
+import cv2
 
 """
 Definition: This function finds the porosity of a given image file. 
@@ -17,7 +16,7 @@ def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_ma
     if image_loaded:
         image = file
     else:
-        image = tiff.imread(file)    # reads image
+        image = cv2.imread(file, cv2.IMREAD_GRAYSCALE)    # reads image
 
     if(len(image.shape) == 3):   # finds x,y dimensions of the image
         x1, y1, _ = image.shape
@@ -25,17 +24,18 @@ def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_ma
         x1, y1 = image.shape
     if(circle_mask):
         X, Y = np.ogrid[0:x1, 0:y1]  # Creates grid of 0's for mask
-        mask = (X - x1 / 2) ** 2 + (Y - y1 / 2) ** 2 > x1 * y1 * (circle_mask_size**2)/ 4 # defines a mask outside the
+        mask = np.add(np.square(X - x1/2), np.square(Y - y1/2)) >= x1 * y1 * (circle_mask_size**2)/ 4 # defines a mask outside the
         # circle
         image[mask] = 0 # Sets image pixels in mask to 0
         original_image = image
         if(threshold):
-            image[image<148] = 0
-            image[image >= 148] = 1
+            num=125
+            image[image<num] = 0
+            image[image >= num] = 1
         # print(np.amax(image))
         total_area = (x1 * y1 * (circle_mask_size**2) / 4) * 3.141592 # Calculates total area of cirlce
         if display_mask:
-            plt.imshow(original_image, cmap='gray')
+            plt.imshow(image, cmap='gray')
             plt.show()
     else:
         total_area = x1*y1
@@ -49,5 +49,5 @@ def calculate_porosity(file, circle_mask=False, circle_mask_size = 1, display_ma
 
     return fiber_area/total_area
 if __name__ == "__main__":
-    file = "/media/samschickler/1F6D-D692/Test/rec_8bit_phase_00010/FiberForm_19A_air_760torr_13_fast_00010_0200.rec.8bit.tif"
-    test = calculate_porosity(file, circle_mask=True, circle_mask_size=.8, display_mask=True, threshold=False)
+    file = "/home/samschickler/Desktop/files/FiberForm_18A_air_200torr_08_00003_0743.rec.8bit.tif"
+    test = calculate_porosity(file, circle_mask=True, circle_mask_size=.8, display_mask=True, threshold=True)

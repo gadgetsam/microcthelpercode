@@ -1,12 +1,13 @@
 """"Author: Sam Schickler"""
 import os
-from skimage.external import tifffile as tiff
+
+# from skimage.external import tifffile as tiff
 from calculate_porosity import calculate_porosity
 import multiprocessing
 import time
 import csv
 import re
-
+import cv2
 """"
 Definition: run_on runs function on all the images in all the folders inside a folder and then outputs the images into an output directory while keeping the file structure the same. It does this in parallel 
 
@@ -18,7 +19,7 @@ Input:
 	"""
 
 
-def run_on(function, folder_path, output_path, num_threads=4):
+def run_on(function, folder_path, output_path, num_threads=48):
     """
     Definition: run_on_files is a worker function that takes a directory and then runs a function on all the files in a directory
     inputs:
@@ -38,7 +39,7 @@ def run_on(function, folder_path, output_path, num_threads=4):
             for file in file_list[0]:
                 # print(file)
                 if ".tif" in file:
-                    image = tiff.imread(directory + "/" + file)  # loads file
+                    image =  cv2.imread(directory + "/" + file, cv2.IMREAD_GRAYSCALE)  # loads file
                     porosity_calc = function(image)
                     id_file = pattern.search(str(file)).group(1)
                     id_directory = directory[-5:]
